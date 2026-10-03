@@ -1,0 +1,120 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haunted party house</title>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+    --night: #1b1030;
+    --plum: #2e1a4f;
+    --pumpkin: #ff7a1a;
+    --bone: white;
+    --slime: green;
+
+
+}
+* {box-sizing: border-box; margin: 0;}
+body{
+    font-family: 'Lora', Georgia, 'Times New Roman', Times, serif;
+    background: var(--night);
+    color: var(--bone);
+    line-height: 1.6;
+}
+h1,h2 {font-family: 'creepster',cursive;
+font-weight: 400;
+ letter-spacing: 2px;}
+ section{ padding: 64px 20px; max-width: 800px; text-align: center;}
+ h2{font-size: 2.6rem; color: var(--pumpkin); margin-bottom: 20px;}
+
+ .hero{
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle at 50% 35%, var(--plum), var(--night) 70%);
+    text-align: center; padding: 20px; position: relative;overflow: hidden;
+ }
+ .hero{font-size: clamp(3rem, 10vw, 6rem); color: var(--pumpkin); text-shadow: 0 0 25px rgba(255,122,26,.6); }
+  .hero p { max-width: 460px; margin: 10px 0 24px; }
+.ghost{
+    position: absolute;font-size: 2.4rem; opacity: .75; animation: float 6s ease-in-out infinite;
+}
+.g1{
+    top: 14%; left: 10%;
+}
+.g2{
+    top: 24%; right: 12%; animation-delay: 2s;
+
+}
+.g3{
+    bottom: 14%; left: 18%; animation-delay: 4s;
+}
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-24px); } }
+.countdown { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .box { background: var(--plum); border: 2px solid var(--pumpkin); border-radius: 12px; padding: 14px 18px; min-width: 84px; }
+  .box strong { display: block; font-family: 'Creepster', cursive; font-size: 2.4rem; color: var(--slime); font-weight: 400; }
+ #result { margin-top: 22px; font-size: 1.3rem; min-height: 2em; }
+ 
+  footer { text-align: center; padding: 30px; color: #a99bc7; font-size: .9rem; }
+ 
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+    button {
+    font: inherit; font-weight: 600; font-size: 1.05rem; cursor: pointer;
+    background: var(--pumpkin); color: var(--night); border: 0;
+    padding: 12px 28px; border-radius: 999px; transition: transform .15s, background .15s;
+  }
+  button:hover { transform: scale(1.06); background: var(--slime); }
+  button:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
+
+</style>
+
+</head>
+<body>
+    <header class="hero">
+        <span class="ghost g1">👻</span><span class="ghost g2"🦇></span><span class="ghost g3">👻</span>
+        <div class="pumpkin" id="pumpkin" title="CLICK ME!" role="img" aria-label="Glowing jack-o'-1antern">
+        <div class="eye 1"></div><div class="eye r"></div><div class="mouth"></div>
+        </div>
+        <h1>HAUNTED HOUSE PARTY</h1>
+        <P>Costumes, Candy and few friendly screams. Come if you dare.</P>
+        <a href="#details"><button>see the details</button></a>
+    </header>
+
+    <section>
+        <h2>
+            Time until halloween
+        </h2>
+        <div class="countdown">
+            <div class="box"><strong id="d">0</strong>days</div>
+            <div class="box"><strong id="h">0</strong>hours</div>
+            <div class="box"><strong id="m">0</strong>minutes</div>
+            <div class="box"><strong id="s">0</strong>seconds</div>
+        </div>
+    </section>
+    <section>
+        <h2>Trick or treat</h2>
+        <button id="treatBtn">Knock on the door</button>
+        <p id="result" aria-live="polite"></p>
+    </section>
+    <footer>MADE WITH 🎃 annnnd a little of fun </footer>
+    <script>
+        
+
+        document.getElementById('treatBtn').addEventListener('click', () => {
+    const pick = outcomes[Math.floor(Math.random() * outcomes.length)];
+    document.getElementById('result').textContent = pick;
+  });
+     function updateCountdown() {
+    const now = new Date();
+    let target = new Date(now.getFullYear(), 9, 31, 19, 0, 0); // month 9 = October
+    if (target < now) target = new Date(now.getFullYear() + 1, 9, 31, 19, 0, 0);
+    const diff = target - now;
+    document.getElementById('d').textContent = Math.floor(diff / 86400000);
+    document.getElementById('h').textContent = Math.floor(diff / 3600000) % 24;
+    document.getElementById('m').textContent = Math.floor(diff / 60000) % 60;
+    document.getElementById('s').textContent = Math.floor(diff / 1000) % 60;
+  }
+    updateCountdown();
+  setInterval(updateCountdown, 1000);
+    </script>
+</body>
+</html>
