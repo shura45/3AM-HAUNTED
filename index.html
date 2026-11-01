@@ -47,7 +47,7 @@ body::after {
     flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle at 50% 35%, var(--plum), var(--night) 70%);
     text-align: center; padding: 20px; position: relative;overflow: hidden;
  }
- .hero h1{font-size: clamp(3rem, 10vw, 6rem); color: var(--pumpkin); text-shadow: 0 0 25px rgba((179,18,31,.8); animation: flicker 5s infinite; position: relative; z-index: 2;}
+ .hero h1{font-size: clamp(3rem, 10vw, 6rem); color: var(--pumpkin); text-shadow: 0 0 25px rgba(179,18,31,.8); animation: flicker 5s infinite; position: relative; z-index: 2;}
   .hero p { max-width: 460px; margin: 10px 0 24px; position: relative; z-index: 2; }
     .time-tag { color: var(--mist); font-size: .95rem; letter-spacing: 3px; margin-bottom: 8px; position: relative; z-index: 2; }
 @keyframes flicker {
@@ -116,9 +116,24 @@ body::after {
 #scare span { filter: drop-shadow(0 0 40px var(--blood)); }
 @keyframes scareflash { 0% { background: #000; } 50% { background: var(--blood); } }
 
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-24px); } }
+
+.countdown { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.box { background: var(--plum); border: 2px solid var(--blood); border-radius: 12px; padding: 14px 18px; min-width: 84px; }
+.box strong { display: block; font-family: 'Creepster', cursive; font-size: 2.4rem; color: var(--slime); font-weight: 400; text-shadow: 0 0 10px rgba(125,255,90,.5); }
+.box.tick strong { animation: glitch .25s; }
+
+.details { list-style: none; padding: 0; display: grid; gap: 12px; text-align: left; max-width: 480px; margin: 0 auto; }
+.details li { border-left: 3px solid var(--blood); padding: 4px 0 4px 14px; }
+.details b { color: var(--pumpkin); }
+
+#result { margin-top: 22px; font-size: 1.3rem; min-height: 3em; }
+#result.shake { animation: shake .4s; color: var(--blood); }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; }
   .eyes { opacity: .8; }
+}
 </style>
 
 </head>
@@ -133,7 +148,7 @@ body::after {
         <div class="pumpkin" id="pumpkin" role="button" tabindex="0"  title="Don’t click me" role="img" aria-label="Glowing jack-o'-lantern. Activate for a jump scare.">
         <div class="eye 1"></div><div class="eye r"></div><div class="mouth"></div>
         </div>
-        <p class="hint">Whatever you do, don’t Scroll</p>
+        <p class="hint">Whatever you do, don’t click pumpkin</p>
   <p class="time-tag">3:00 AM. THE HOUSE IS AWAKE.</p>
         <h1>HAUNTED HOUSE PARTY</h1>
         <P>Costumes, Candy and few friendly screams. Come if you dare.</P>
@@ -171,7 +186,6 @@ body::after {
     <div id="scare" role="dialog" aria-label="Jump scare. Click to close."><span>💀</span></div>
 
     <script>
- /* Flashlight follows mouse / finger */
 function light(x, y) {
   document.body.style.setProperty('--mx', x + 'px');
   document.body.style.setProperty('--my', y + 'px');
@@ -179,7 +193,6 @@ function light(x, y) {
 window.addEventListener('mousemove', e => light(e.clientX, e.clientY));
 window.addEventListener('touchmove', e => light(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
 
-/* Spooky sound with WebAudio (no files needed) */
 let ctx;
 function scream() {
   try {
@@ -192,7 +205,7 @@ function scream() {
     g.gain.setValueAtTime(.001, t); g.gain.exponentialRampToValueAtTime(.35, t + .03); g.gain.exponentialRampToValueAtTime(.001, t + 1);
     osc.connect(g); osc2.connect(g); g.connect(ctx.destination);
     osc.start(t); osc2.start(t); osc.stop(t + 1); osc2.stop(t + 1);
-  } catch (e) { /* audio blocked, the visual scare still works */ }
+  } catch (e) { }
 }
 function creak() {
   try {
@@ -205,7 +218,6 @@ function creak() {
   } catch (e) {}
 }
 
-/* Jump scare */
 const scare = document.getElementById('scare');
 const pumpkin = document.getElementById('pumpkin');
 function jump() {
@@ -216,7 +228,6 @@ pumpkin.addEventListener('click', jump);
 pumpkin.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); jump(); } });
 scare.addEventListener('click', () => scare.classList.remove('on'));
 
-/* Trick or treat */
 const outcomes = [
   '🍬 A full-size candy bar. Suspiciously fresh.',
   '👁️ The door opens. Nobody is there. The candy bowl is still warm.',
@@ -239,12 +250,11 @@ document.getElementById('treatBtn').addEventListener('click', () => {
   creak();
 });
 
-/* Countdown */
 const late = document.getElementById('late');
 let prevS = null;
 function updateCountdown() {
   const now = new Date();
-  let target = new Date(now.getFullYear(), 9, 31, 19, 0, 0); // month 9 = October
+  let target = new Date(now.getFullYear(), 9, 31, 19, 0, 0); 
   if (target < now) target = new Date(now.getFullYear() + 1, 9, 31, 19, 0, 0);
   const diff = target - now;
   const s = Math.floor(diff / 1000) % 60;
@@ -263,7 +273,6 @@ function updateCountdown() {
 updateCountdown();
 setInterval(updateCountdown, 1000);
 
-/* Title glitches randomly */
 setInterval(() => {
   const h = document.querySelector('.hero h1');
   h.style.transform = 'translate(' + (Math.random() * 6 - 3) + 'px,' + (Math.random() * 4 - 2) + 'px) skewX(' + (Math.random() * 6 - 3) + 'deg)';
