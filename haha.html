@@ -125,9 +125,16 @@ body::after {
 <body>
     <header class="hero">
         <span class="ghost g1">👻</span><span class="ghost g2"🦇></span><span class="ghost g3">👻</span>
-        <div class="pumpkin" id="pumpkin" title="CLICK ME!" role="img" aria-label="Glowing jack-o'-1antern">
+         <div class="eyes e1"><i></i><i></i></div>
+  <div class="eyes e2"><i></i><i></i></div>
+  <div class="eyes e3"><i></i><i></i></div>
+  <div class="fog"></div>
+        
+        <div class="pumpkin" id="pumpkin" role="button" tabindex="0"  title="Don’t click me" role="img" aria-label="Glowing jack-o'-lantern. Activate for a jump scare.">
         <div class="eye 1"></div><div class="eye r"></div><div class="mouth"></div>
         </div>
+        <p class="hint">Whatever you do, don’t Scroll</p>
+  <p class="time-tag">3:00 AM. THE HOUSE IS AWAKE.</p>
         <h1>HAUNTED HOUSE PARTY</h1>
         <P>Costumes, Candy and few friendly screams. Come if you dare.</P>
         <a href="#details"><button>see the details</button></a>
@@ -143,6 +150,17 @@ body::after {
             <div class="box"><strong id="m">0</strong>minutes</div>
             <div class="box"><strong id="s">0</strong>seconds</div>
         </div>
+        <p id="late" aria-live="polite"></p>
+</section>
+
+<section id="details">
+  <h2>If you dare</h2>
+  <ul class="details">
+    <li><b>When:</b> October 31, 7:00 PM until the candles die.</li>
+    <li><b>Where:</b> The house at the end of the street. You will know it.</li>
+    <li><b>Wear:</b> A costume. Guests without one may be mistaken for the haunted.</li>
+    <li><b>Bring:</b> Candy, courage and a friend. Never go upstairs alone.</li>
+  </ul>
     </section>
     <section>
         <h2>Trick or treat</h2>
@@ -150,25 +168,107 @@ body::after {
         <p id="result" aria-live="polite"></p>
     </section>
     <footer>MADE WITH 🎃 annnnd a little of fun </footer>
-    <script>
-        
+    <div id="scare" role="dialog" aria-label="Jump scare. Click to close."><span>💀</span></div>
 
-        document.getElementById('treatBtn').addEventListener('click', () => {
-    const pick = outcomes[Math.floor(Math.random() * outcomes.length)];
-    document.getElementById('result').textContent = pick;
-  });
-     function updateCountdown() {
-    const now = new Date();
-    let target = new Date(now.getFullYear(), 9, 31, 19, 0, 0); // month 9 = October
-    if (target < now) target = new Date(now.getFullYear() + 1, 9, 31, 19, 0, 0);
-    const diff = target - now;
-    document.getElementById('d').textContent = Math.floor(diff / 86400000);
-    document.getElementById('h').textContent = Math.floor(diff / 3600000) % 24;
-    document.getElementById('m').textContent = Math.floor(diff / 60000) % 60;
-    document.getElementById('s').textContent = Math.floor(diff / 1000) % 60;
+    <script>
+ /* Flashlight follows mouse / finger */
+function light(x, y) {
+  document.body.style.setProperty('--mx', x + 'px');
+  document.body.style.setProperty('--my', y + 'px');
+}
+window.addEventListener('mousemove', e => light(e.clientX, e.clientY));
+window.addEventListener('touchmove', e => light(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+
+/* Spooky sound with WebAudio (no files needed) */
+let ctx;
+function scream() {
+  try {
+    ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+    const t = ctx.currentTime;
+    const osc = ctx.createOscillator(), osc2 = ctx.createOscillator(), g = ctx.createGain();
+    osc.type = 'sawtooth'; osc2.type = 'square';
+    osc.frequency.setValueAtTime(900, t); osc.frequency.exponentialRampToValueAtTime(180, t + .9);
+    osc2.frequency.setValueAtTime(1350, t); osc2.frequency.exponentialRampToValueAtTime(240, t + .9);
+    g.gain.setValueAtTime(.001, t); g.gain.exponentialRampToValueAtTime(.35, t + .03); g.gain.exponentialRampToValueAtTime(.001, t + 1);
+    osc.connect(g); osc2.connect(g); g.connect(ctx.destination);
+    osc.start(t); osc2.start(t); osc.stop(t + 1); osc2.stop(t + 1);
+  } catch (e) { /* audio blocked, the visual scare still works */ }
+}
+function creak() {
+  try {
+    ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+    const t = ctx.currentTime, o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(120, t); o.frequency.linearRampToValueAtTime(60, t + .8);
+    g.gain.setValueAtTime(.12, t); g.gain.exponentialRampToValueAtTime(.001, t + .8);
+    o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + .8);
+  } catch (e) {}
+}
+
+/* Jump scare */
+const scare = document.getElementById('scare');
+const pumpkin = document.getElementById('pumpkin');
+function jump() {
+  scare.classList.add('on'); scream();
+  if (navigator.vibrate) navigator.vibrate([200, 80, 200]);
+}
+pumpkin.addEventListener('click', jump);
+pumpkin.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); jump(); } });
+scare.addEventListener('click', () => scare.classList.remove('on'));
+
+/* Trick or treat */
+const outcomes = [
+  '🍬 A full-size candy bar. Suspiciously fresh.',
+  '👁️ The door opens. Nobody is there. The candy bowl is still warm.',
+  '🕷️ A handful of spiders. They are not candy.',
+  '🧛 “Come in,” says a voice from the dark. “We have been waiting.”',
+  '💀 A bony hand gives you a lollipop. It whispers your name.',
+  '🍭 Sweet! Wait. Who is knocking from inside the house?',
+  '🕯️ The candles blow out. Something breathes behind you.',
+  '🩸 You get a candy apple. It is not caramel.'
+];
+        const scary = [1, 3, 4, 6, 7];
+let last = -1;
+document.getElementById('treatBtn').addEventListener('click', () => {
+  let i; do { i = Math.floor(Math.random() * outcomes.length); } while (i === last);
+  last = i;
+  const r = document.getElementById('result');
+  r.textContent = outcomes[i];
+  r.classList.remove('shake'); void r.offsetWidth;
+  if (scary.includes(i)) r.classList.add('shake');
+  creak();
+});
+
+/* Countdown */
+const late = document.getElementById('late');
+let prevS = null;
+function updateCountdown() {
+  const now = new Date();
+  let target = new Date(now.getFullYear(), 9, 31, 19, 0, 0); // month 9 = October
+  if (target < now) target = new Date(now.getFullYear() + 1, 9, 31, 19, 0, 0);
+  const diff = target - now;
+  const s = Math.floor(diff / 1000) % 60;
+  document.getElementById('d').textContent = Math.floor(diff / 86400000);
+  document.getElementById('h').textContent = Math.floor(diff / 3600000) % 24;
+  document.getElementById('m').textContent = Math.floor(diff / 60000) % 60;
+  document.getElementById('s').textContent = s;
+  if (prevS !== null && prevS !== s) {
+    const b = document.getElementById('s').parentElement;
+    b.classList.remove('tick'); void b.offsetWidth; b.classList.add('tick');
   }
-    updateCountdown();
-  setInterval(updateCountdown, 1000);
+  prevS = s;
+  const days = Math.floor(diff / 86400000);
+  late.textContent = days > 300 ? 'You missed it. They are still here.' : (days < 1 ? 'Tonight. Lock your doors.' : 'Every second brings it closer.');
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+/* Title glitches randomly */
+setInterval(() => {
+  const h = document.querySelector('.hero h1');
+  h.style.transform = 'translate(' + (Math.random() * 6 - 3) + 'px,' + (Math.random() * 4 - 2) + 'px) skewX(' + (Math.random() * 6 - 3) + 'deg)';
+  setTimeout(() => h.style.transform = '', 90);
+}, 3500);
     </script>
 </body>
 </html>
